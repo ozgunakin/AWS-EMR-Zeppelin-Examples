@@ -8,6 +8,11 @@ https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-gs.html
 #### Instance Types
 https://aws.amazon.com/tr/ec2/instance-types/
 
+#### Spark Submit
+https://sparkbyexamples.com/spark/spark-submit-command/
+
+https://spark.apache.org/docs/latest/submitting-applications.html
+
 #### Spark Configuration Optimizations
 http://spark-configuration.luminousmen.com
 
