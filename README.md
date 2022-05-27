@@ -8,6 +8,8 @@ https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-gs.html
 #### Instance Types
 https://aws.amazon.com/tr/ec2/instance-types/
 
+#### Spark Configuration Optimizations
+http://spark-configuration.luminousmen.com
 
 ## Zeppelin SSH Connection:
 
