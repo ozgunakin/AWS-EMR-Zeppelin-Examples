@@ -1,4 +1,4 @@
-# AWS-EMR-Zeppelin-Examples
+# AWS EMR Zeppelin Examples
 
 ## Zeppelin SSH Connection:
 
