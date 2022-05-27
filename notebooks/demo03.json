@@ -1,0 +1,2517 @@
+{
+  "paragraphs": [
+    {
+      "title": "Zeppelin Demo Notebook 4",
+      "text": "%md\nDemonstrate loading, querying, visualizing, and saving the GroupLens MovieLens Latest Datasets from an [Amazon RDS PostgreSQL](https://aws.amazon.com/rds/postgresql/) database.",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:11.198",
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9.0,
+        "editorHide": true,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eDemonstrate loading, querying, visualizing, and saving the GroupLens MovieLens Latest Datasets from an \u003ca href\u003d\"https://aws.amazon.com/rds/postgresql/\"\u003eAmazon RDS PostgreSQL\u003c/a\u003e database.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447055_1018817003",
+      "id": "20191106-153644_419077851",
+      "dateCreated": "2019-11-15 22:37:27.055",
+      "dateStarted": "2019-11-27 19:09:11.200",
+      "dateFinished": "2019-11-27 19:09:11.207",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Set all Variable Values",
+      "text": "%spark.pyspark\n# change me\nZEPPELIN_DEMO_BUCKET\u003d\"gstafford-emr-demo-us-east1\"\nRDS_URL\u003d\"zeppelin-demo.c6louiq8ibk3.us-east-1.rds.amazonaws.com\"\nRDS_USER\u003d\"masteruser\"\nRDS_PASSWORD\u003d\"5up3r53cr3tPa55w0rd\"\n\n# don\u0027t change me\nRDS_DRIVER\u003d\"org.postgresql.Driver\"\nRDS_PORT\u003d\"5432\"\nRDS_DATABASE\u003d\"ratings\"\n\nRDS_JDBC\u003d\"jdbc:postgresql://\" + RDS_URL + \":\" + RDS_PORT + \"/\" + RDS_DATABASE\nprint(\"RDS_JDBC:\", RDS_JDBC)\nRDS_CONN_STR \u003d \"host\u003d\" + RDS_URL + \" port\u003d\" + RDS_PORT + \" dbname\u003d\" + RDS_DATABASE + \" user\u003d\" + RDS_USER + \" password\u003d\" + RDS_PASSWORD\nprint(\"RDS_CONN_STR:\", RDS_CONN_STR)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.406",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true,
+        "lineNumbers": true,
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "RDS_JDBC: jdbc:postgresql://zeppelin-demo.c6louiq8ibk3.us-east-1.rds.amazonaws.com:5432/ratings\nRDS_CONN_STR: host\u003dzeppelin-demo.c6louiq8ibk3.us-east-1.rds.amazonaws.com port\u003d5432 dbname\u003dratings user\u003dmasteruser password\u003d5up3r53cr3tPa55w0rd\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573858334281_-1541930181",
+      "id": "20191115-225214_1100995277",
+      "dateCreated": "2019-11-15 22:52:14.281",
+      "dateStarted": "2019-11-27 19:08:30.876",
+      "dateFinished": "2019-11-27 19:08:30.883",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Load MovieLens Data from GroupLens",
+      "text": "%sh\n#change me - choices: or ml-latest-small (100k) or ml-latest (27MM)\nDATASET\u003d\"ml-latest-small\"\n\nif [ -d $DATASET ]; then\n    echo \"$DATASET exist\"\nelse \n    wget -nv http://files.grouplens.org/datasets/movielens/$DATASET.zip -O $DATASET.zip \u0026\u0026 unzip $DATASET.zip\nfi\n\n# copy from local file system (/var/lib/zeppelin) to the destination file system (/user/zeppelin)\nhadoop fs -put -f $DATASET/movies.csv $DATASET/ratings.csv .\nhadoop fs -ls -h .",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.421",
+      "config": {
+        "lineNumbers": true,
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "selectedInterpreter": {
+          "name": "python",
+          "profile": "python",
+          "isCustom": false,
+          "editorLanguage": "python",
+          "className": "org.apache.zeppelin.python.PythonInterpreter",
+          "isDefault": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sh",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": [
+          {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false
+            }
+          }
+        ],
+        "enabled": true
+      },
+      "settings": {
+        "params": {
+          "HADOOP_HOME": ""
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "ml-latest-small exist\nFound 3 items\ndrwxr-xr-x   - zeppelin hadoop          0 2019-11-27 18:53 .sparkStaging\n-rw-r--r--   1 zeppelin hadoop    482.8 K 2019-11-27 19:08 movies.csv\n-rw-r--r--   1 zeppelin hadoop      2.4 M 2019-11-27 19:08 ratings.csv\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447060_-73940823",
+      "id": "20191009-042907_1768707497",
+      "dateCreated": "2019-11-15 22:37:27.060",
+      "dateStarted": "2019-11-27 19:08:30.988",
+      "dateFinished": "2019-11-27 19:08:35.168",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Create Spark Session",
+      "text": "%spark.pyspark\nfrom pyspark import SparkFiles\nfrom pyspark.sql import SparkSession\nfrom pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType\n\nspark \u003d SparkSession \\\n    .builder \\\n    .appName(\"pyspark_demo_app\") \\\n    .getOrCreate()",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.436",
+      "config": {
+        "lineNumbers": true,
+        "tableHide": false,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "selectedInterpreter": {
+          "name": "spark.pyspark",
+          "profile": "pyspark",
+          "isCustom": false,
+          "editorLanguage": "python",
+          "className": "org.apache.zeppelin.spark.PySparkInterpreter",
+          "isDefault": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": [
+          {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false
+            }
+          }
+        ],
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447060_1873578708",
+      "id": "20191009-042751_2109019779",
+      "dateCreated": "2019-11-15 22:37:27.060",
+      "dateStarted": "2019-11-27 19:08:35.202",
+      "dateFinished": "2019-11-27 19:08:35.208",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Download DDL from S3 and Execute Against RDS",
+      "text": "%spark.pyspark\nimport boto3\nimport psycopg2\nimport csv\n\ns3 \u003d boto3.client(\u0027s3\u0027)\ns3.download_file(ZEPPELIN_DEMO_BUCKET, \"bootstrap/ratings.sql\", \"ratings.sql\")\n\nconn \u003d psycopg2.connect(RDS_CONN_STR)\nconn.autocommit \u003d True\ncursor \u003d conn.cursor()\n\nsql_file \u003d open(\"ratings.sql\", \"r\")\nsql_commands \u003d sql_file.read()\nsql_file.close()\ncommands \u003d sql_commands.split(\";\")\nfor command in commands:\n    print(command)\n    if command.strip() !\u003d \"\":\n        cursor.execute(command)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.451",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "lineNumbers": true,
+        "title": true,
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "-- Create Movie Ratings PostgreSQL database schema (DDL)\n\nDROP TABLE IF EXISTS public.ratings\n\n\nDROP TABLE IF EXISTS public.tags\n\n\nDROP TABLE IF EXISTS public.links\n\n\nDROP TABLE IF EXISTS public.movies\n\n\nDROP SCHEMA IF EXISTS public\n\n\nCREATE SCHEMA public\n\n\nCOMMENT ON SCHEMA public IS \u0027standard public schema\u0027\n\n\nALTER SCHEMA public OWNER TO masteruser\n\n\nCREATE TABLE IF NOT EXISTS public.movies (\n    movieId bigint NOT NULL CONSTRAINT movies_pkey PRIMARY KEY,\n    title text NOT NULL,\n    genres text NOT NULL\n)\n\n\nALTER TABLE public.movies OWNER TO masteruser\n\n\nCREATE TABLE IF NOT EXISTS public.ratings (\n    userId bigint NOT NULL,\n    movieId bigint NOT NULL CONSTRAINT ratings_movies_movie_id_fk REFERENCES public.movies ON UPDATE CASCADE ON DELETE RESTRICT,\n    rating numeric(2, 1) NOT NULL,\n    timestamp bigint NOT NULL\n)\n\n\nALTER TABLE public.ratings OWNER TO masteruser\n\n\nCREATE TABLE IF NOT EXISTS public.links (\n    movieId bigint NOT NULL CONSTRAINT links_movies_movie_id_fk REFERENCES public.movies ON UPDATE CASCADE ON DELETE RESTRICT,\n    imdbId bigint NOT NULL,\n    tmdbId bigint NOT NULL\n)\n\n\nALTER TABLE public.links OWNER TO masteruser\n\n\nCREATE TABLE IF NOT EXISTS public.tags (\n    userId bigint NOT NULL,\n    movieId bigint NOT NULL CONSTRAINT tags_movies_movie_id_fk REFERENCES public.movies ON UPDATE CASCADE ON DELETE RESTRICT,\n    tag text NOT NULL,\n    timestamp bigint NOT NULL\n)\n\n\nALTER TABLE public.tags OWNER TO masteruser\n\n\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573858621983_-719772124",
+      "id": "20191115-225701_570184306",
+      "dateCreated": "2019-11-15 22:57:01.983",
+      "dateStarted": "2019-11-27 19:08:35.314",
+      "dateFinished": "2019-11-27 19:08:35.615",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Import Movies from CSV File to RDS",
+      "text": "%spark.pyspark\n# source: https://www.dataquest.io/blog/loading-data-into-postgres/\n# the slow way since the titles contain commas\nsql_query \u003d \"INSERT INTO movies (movieId, title, genres) VALUES (%s, %s, %s)\"\nwith open(\"ml-latest-small/movies.csv\", \"r\") as f:\n    reader \u003d csv.reader(f)\n    next(reader)  # Skip the header row.\n    for row in reader:\n        cursor.execute(sql_query, row)\n        conn.commit()",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.467",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 93.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "lineNumbers": true,
+        "title": true,
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[\u0027movieId\u0027, \u0027title\u0027, \u0027genres\u0027]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573859119530_1400559415",
+      "id": "20191115-230519_1758370056",
+      "dateCreated": "2019-11-15 23:05:19.530",
+      "dateStarted": "2019-11-27 19:08:35.726",
+      "dateFinished": "2019-11-27 19:08:49.137",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Import Ratings from CSV File to RDS",
+      "text": "%spark.pyspark\n# the fast way...\nwith open(\"ml-latest-small/ratings.csv\", \"r\") as f:\n    # Notice that we don\"t need the `csv` module.\n    next(f) # Skip the header row.\n    cursor.copy_from(f, \"ratings\", sep\u003d\",\", \n        columns\u003d(\"userId\", \"movieId\", \"rating\", \"timestamp\"))\n    conn.commit()\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.483",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 93.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "lineNumbers": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u0027userId,movieId,rating,timestamp\\n\u0027\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573859599003_571265236",
+      "id": "20191115-231319_636045926",
+      "dateCreated": "2019-11-15 23:13:19.003",
+      "dateStarted": "2019-11-27 19:08:49.251",
+      "dateFinished": "2019-11-27 19:08:50.115",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Load Movies Data from RDS into DataFrame",
+      "text": "%spark.pyspark\nRDS_TABLE\u003d\"movies\"\n\nmovies_df \u003d spark.read \\\n    .format(\"jdbc\") \\\n    .option(\"driver\",RDS_DRIVER) \\\n    .option(\"url\", RDS_JDBC) \\\n    .option(\"user\",RDS_USER) \\\n    .option(\"password\", RDS_PASSWORD) \\\n    .option(\"dbtable\", RDS_TABLE) \\\n    .load()\n\nprint(\"DataFrame rows: %d\" % movies_df.count())\nprint(\"DataFrame schema: %s\" % movies_df)\nmovies_df.show(10, False)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.497",
+      "config": {
+        "lineNumbers": true,
+        "tableHide": false,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "selectedInterpreter": {
+          "name": "spark.pyspark",
+          "profile": "pyspark",
+          "isCustom": false,
+          "editorLanguage": "python",
+          "className": "org.apache.zeppelin.spark.PySparkInterpreter",
+          "isDefault": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": [
+          {
+            "graph": {
+              "mode": "table",
+              "height": 355.0,
+              "optionOpen": false
+            }
+          }
+        ],
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "DataFrame rows: 9742\nDataFrame schema: DataFrame[movieid: bigint, title: string, genres: string]\n+-------+----------------------------------+-------------------------------------------+\n|movieid|title                             |genres                                     |\n+-------+----------------------------------+-------------------------------------------+\n|1      |Toy Story (1995)                  |Adventure|Animation|Children|Comedy|Fantasy|\n|2      |Jumanji (1995)                    |Adventure|Children|Fantasy                 |\n|3      |Grumpier Old Men (1995)           |Comedy|Romance                             |\n|4      |Waiting to Exhale (1995)          |Comedy|Drama|Romance                       |\n|5      |Father of the Bride Part II (1995)|Comedy                                     |\n|6      |Heat (1995)                       |Action|Crime|Thriller                      |\n|7      |Sabrina (1995)                    |Comedy|Romance                             |\n|8      |Tom and Huck (1995)               |Adventure|Children                         |\n|9      |Sudden Death (1995)               |Action                                     |\n|10     |GoldenEye (1995)                  |Action|Adventure|Thriller                  |\n+-------+----------------------------------+-------------------------------------------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447061_-1063899103",
+      "id": "20191009-044129_2035687603",
+      "dateCreated": "2019-11-15 22:37:27.061",
+      "dateStarted": "2019-11-27 19:08:50.173",
+      "dateFinished": "2019-11-27 19:08:50.490",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Load Ratings Data from RDS into DataFrame",
+      "text": "%spark.pyspark\nRDS_TABLE\u003d\"ratings\"\n\nratings_df \u003d spark.read \\\n    .format(\"jdbc\") \\\n    .option(\"driver\",RDS_DRIVER) \\\n    .option(\"url\", RDS_JDBC) \\\n    .option(\"user\",RDS_USER) \\\n    .option(\"password\", RDS_PASSWORD) \\\n    .option(\"dbtable\", RDS_TABLE) \\\n    .load()\n\nprint(\"DataFrame rows: %d\" % ratings_df.count())\nprint(\"DataFrame schema: %s\" % ratings_df)\nratings_df.show(10, False)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.511",
+      "config": {
+        "lineNumbers": true,
+        "tableHide": false,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "selectedInterpreter": {
+          "name": "spark.pyspark",
+          "profile": "pyspark",
+          "isCustom": false,
+          "editorLanguage": "python",
+          "className": "org.apache.zeppelin.spark.PySparkInterpreter",
+          "isDefault": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": [
+          {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false
+            }
+          }
+        ],
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "DataFrame rows: 100836\nDataFrame schema: DataFrame[userid: bigint, movieid: bigint, rating: decimal(2,1), timestamp: bigint]\n+------+-------+------+---------+\n|userid|movieid|rating|timestamp|\n+------+-------+------+---------+\n|1     |1      |4.0   |964982703|\n|1     |3      |4.0   |964981247|\n|1     |6      |4.0   |964982224|\n|1     |47     |5.0   |964983815|\n|1     |50     |5.0   |964982931|\n|1     |70     |3.0   |964982400|\n|1     |101    |5.0   |964980868|\n|1     |110    |4.0   |964982176|\n|1     |151    |5.0   |964984041|\n|1     |157    |5.0   |964984100|\n+------+-------+------+---------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447061_1340957005",
+      "id": "20191107-235557_158160591",
+      "dateCreated": "2019-11-15 22:37:27.061",
+      "dateStarted": "2019-11-27 19:08:50.595",
+      "dateFinished": "2019-11-27 19:08:51.068",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Create Temporary View and Query Data using SQL",
+      "text": "%spark.pyspark\nratings_df.createOrReplaceTempView(\"ratings\")\nmovies_df.createOrReplaceTempView(\"movies\")\n\ntop_movies_df \u003d spark.sql(\"SELECT m.title, CAST(AVG(r.rating) AS DECIMAL(3,2)) as avg_rating, COUNT(r.rating) as cnt_ratings \" +\n                          \"FROM ratings r \" +\n                          \"JOIN movies m ON (r.movieId \u003d m.movieId) \" +\n                          \"GROUP BY m.title \" +\n                          \"ORDER BY avg_rating DESC, cnt_ratings DESC, m.title ASC\")\n                        \ntop_movies_df \u003d top_movies_df.filter(top_movies_df.cnt_ratings \u003e\u003d 25)\n\nprint(\"DataFrame rows: %d\" % top_movies_df.count())\nprint(\"Top 10 Movies\")\ntop_movies_df.show(10, False)",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.528",
+      "config": {
+        "lineNumbers": true,
+        "tableHide": false,
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "selectedInterpreter": {
+          "name": "spark.pyspark",
+          "profile": "pyspark",
+          "isCustom": false,
+          "editorLanguage": "python",
+          "className": "org.apache.zeppelin.spark.PySparkInterpreter",
+          "isDefault": false
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9.0,
+        "editorHide": false,
+        "title": true,
+        "results": [
+          {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false
+            }
+          }
+        ],
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "DataFrame rows: 1050\nTop 10 Movies\n+---------------------------------------------+----------+-----------+\n|title                                        |avg_rating|cnt_ratings|\n+---------------------------------------------+----------+-----------+\n|Shawshank Redemption, The (1994)             |4.43      |317        |\n|Sunset Blvd. (a.k.a. Sunset Boulevard) (1950)|4.33      |27         |\n|Philadelphia Story, The (1940)               |4.31      |29         |\n|Lawrence of Arabia (1962)                    |4.30      |45         |\n|In the Name of the Father (1993)             |4.30      |25         |\n|Godfather, The (1972)                        |4.29      |192        |\n|Hoop Dreams (1994)                           |4.29      |29         |\n|Harold and Maude (1971)                      |4.29      |26         |\n|Logan (2017)                                 |4.28      |25         |\n|Fight Club (1999)                            |4.27      |218        |\n+---------------------------------------------+----------+-----------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1573857447063_873096470",
+      "id": "20191009-050155_2142326603",
+      "dateCreated": "2019-11-15 22:37:27.063",
+      "dateStarted": "2019-11-27 19:08:51.111",
+      "dateFinished": "2019-11-27 19:09:02.919",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%postgres\nSELECT table_schema, table_catalog, table_name\nFROM information_schema.tables\nWHERE table_schema\u003d\u0027public\u0027\nORDER BY table_schema, table_catalog, table_name;",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.543",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "table_schema": "string",
+                      "table_catalog": "string",
+                      "table_name": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "lineNumbers": true,
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "table_schema\ttable_catalog\ttable_name\npublic\tratings\tlinks\npublic\tratings\tmovies\npublic\tratings\tratings\npublic\tratings\ttags\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574367954183_-409309382",
+      "id": "20191121-202554_1031349848",
+      "dateCreated": "2019-11-21 20:25:54.183",
+      "dateStarted": "2019-11-27 19:09:02.967",
+      "dateFinished": "2019-11-27 19:09:02.979",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Query RDS Database using Zeppelin JDBC PostgreSQL Interpreter",
+      "text": "%postgres\nWITH tmp_table AS (\n    SELECT m.title, AVG(r.rating) as avg_rating, COUNT(r.rating) as cnt_ratings\n    FROM ratings r\n    JOIN movies m ON (r.movieId \u003d m.movieId)\n    GROUP BY m.title)\n    \nSELECT title, CAST(avg_rating AS DECIMAL(3,2)), cnt_ratings\nFROM tmp_table\nWHERE avg_rating \u003e ${avgRatingMin\u003d4} AND cnt_ratings \u003e\u003d ${RatingsMin\u003d100}\nORDER BY avg_rating ASC, cnt_ratings DESC, title ASC\nLIMIT 25;",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.560",
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12.0,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9.0,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "title",
+                        "visible": true,
+                        "width": 569.0,
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "avg_rating",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "cnt_ratings",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1.0,
+                      "paginationPageSize": 250.0
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "title": "string",
+                      "avg_rating": "string",
+                      "cnt_ratings": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "ultimate-column-chart": {
+                  "chartChanged": true,
+                  "parameterChanged": false,
+                  "panel": {
+                    "columnPanelOpened": true,
+                    "parameterPanelOpened": false
+                  },
+                  "spec": {
+                    "charts": {
+                      "column": {
+                        "transform": {
+                          "method": "array"
+                        },
+                        "sharedAxis": true,
+                        "axis": {
+                          "xAxis": {
+                            "dimension": "multiple",
+                            "axisType": "key",
+                            "name": "xAxis"
+                          },
+                          "yAxis": {
+                            "dimension": "multiple",
+                            "axisType": "aggregator",
+                            "minAxisCount": 1.0,
+                            "name": "yAxis"
+                          },
+                          "category": {
+                            "dimension": "multiple",
+                            "axisType": "group",
+                            "name": "category"
+                          }
+                        },
+                        "parameter": {
+                          "inverted": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "invert x and y axes",
+                            "widget": "checkbox",
+                            "name": "inverted"
+                          },
+                          "floatingLegend": {
+                            "valueType": "string",
+                            "defaultValue": "default",
+                            "description": "floating legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "default",
+                              "top-right",
+                              "top-left"
+                            ],
+                            "name": "floatingLegend"
+                          },
+                          "rotateXAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate xAxis labels",
+                            "name": "rotateXAxisLabel"
+                          },
+                          "rotateYAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate yAxis labels",
+                            "name": "rotateYAxisLabel"
+                          },
+                          "dataLabel": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "use data labels in column",
+                            "widget": "checkbox",
+                            "name": "dataLabel"
+                          },
+                          "dataLabelRotation": {
+                            "valueType": "int",
+                            "defaultValue": -90.0,
+                            "description": "rotate data labels",
+                            "name": "dataLabelRotation"
+                          },
+                          "dataLabelPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "dataLabelPrecision"
+                          },
+                          "tooltipPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "tooltipPrecision"
+                          },
+                          "legendLabelFormat": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "legendLabelFormat"
+                          },
+                          "xAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "xAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "xAxisPosition"
+                          },
+                          "yAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "left",
+                            "description": "yAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "left",
+                              "right"
+                            ],
+                            "name": "yAxisPosition"
+                          },
+                          "showLegend": {
+                            "valueType": "boolean",
+                            "defaultValue": true,
+                            "description": "show legend",
+                            "widget": "checkbox",
+                            "name": "showLegend"
+                          },
+                          "legendPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "position of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "legendPosition"
+                          },
+                          "legendLayout": {
+                            "valueType": "string",
+                            "defaultValue": "horizontal",
+                            "description": "layout of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "horizontal",
+                              "vertical"
+                            ],
+                            "name": "legendLayout"
+                          },
+                          "zoomType": {
+                            "valueType": "string",
+                            "defaultValue": "x",
+                            "description": "type of zoom",
+                            "widget": "option",
+                            "optionValues": [
+                              "y",
+                              "x",
+                              "xy",
+                              "none"
+                            ],
+                            "name": "zoomType"
+                          },
+                          "subTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "sub title of chart",
+                            "name": "subTitle"
+                          },
+                          "mainTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "main title of chart",
+                            "name": "mainTitle"
+                          },
+                          "xAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of xAxis",
+                            "name": "xAxisUnit"
+                          },
+                          "yAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of yAxis",
+                            "name": "yAxisUnit"
+                          },
+                          "xAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of xAxis",
+                            "name": "xAxisName"
+                          },
+                          "yAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of yAxis",
+                            "name": "yAxisName"
+                          }
+                        }
+                      },
+                      "stacked": {
+                        "transform": {
+                          "method": "array"
+                        },
+                        "sharedAxis": true,
+                        "axis": {
+                          "xAxis": {
+                            "dimension": "multiple",
+                            "axisType": "key",
+                            "name": "xAxis"
+                          },
+                          "yAxis": {
+                            "dimension": "multiple",
+                            "axisType": "aggregator",
+                            "minAxisCount": 1.0,
+                            "name": "yAxis"
+                          },
+                          "category": {
+                            "dimension": "multiple",
+                            "axisType": "group",
+                            "name": "category"
+                          }
+                        },
+                        "parameter": {
+                          "inverted": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "invert x and y axes",
+                            "widget": "checkbox",
+                            "name": "inverted"
+                          },
+                          "floatingLegend": {
+                            "valueType": "string",
+                            "defaultValue": "default",
+                            "description": "floating legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "default",
+                              "top-right",
+                              "top-left"
+                            ],
+                            "name": "floatingLegend"
+                          },
+                          "rotateXAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate xAxis labels",
+                            "name": "rotateXAxisLabel"
+                          },
+                          "rotateYAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate yAxis labels",
+                            "name": "rotateYAxisLabel"
+                          },
+                          "dataLabel": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "use data labels in column",
+                            "widget": "checkbox",
+                            "name": "dataLabel"
+                          },
+                          "dataLabelRotation": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate data labels",
+                            "name": "dataLabelRotation"
+                          },
+                          "dataLabelPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "dataLabelPrecision"
+                          },
+                          "tooltipPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "tooltipPrecision"
+                          },
+                          "legendLabelFormat": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "legendLabelFormat"
+                          },
+                          "xAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "xAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "xAxisPosition"
+                          },
+                          "yAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "left",
+                            "description": "yAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "left",
+                              "right"
+                            ],
+                            "name": "yAxisPosition"
+                          },
+                          "showLegend": {
+                            "valueType": "boolean",
+                            "defaultValue": true,
+                            "description": "show legend",
+                            "widget": "checkbox",
+                            "name": "showLegend"
+                          },
+                          "legendPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "position of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "legendPosition"
+                          },
+                          "legendLayout": {
+                            "valueType": "string",
+                            "defaultValue": "horizontal",
+                            "description": "layout of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "horizontal",
+                              "vertical"
+                            ],
+                            "name": "legendLayout"
+                          },
+                          "zoomType": {
+                            "valueType": "string",
+                            "defaultValue": "x",
+                            "description": "type of zoom",
+                            "widget": "option",
+                            "optionValues": [
+                              "y",
+                              "x",
+                              "xy",
+                              "none"
+                            ],
+                            "name": "zoomType"
+                          },
+                          "subTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "sub title of chart",
+                            "name": "subTitle"
+                          },
+                          "mainTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "main title of chart",
+                            "name": "mainTitle"
+                          },
+                          "xAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of xAxis",
+                            "name": "xAxisUnit"
+                          },
+                          "yAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of yAxis",
+                            "name": "yAxisUnit"
+                          },
+                          "xAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of xAxis",
+                            "name": "xAxisName"
+                          },
+                          "yAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of yAxis",
+                            "name": "yAxisName"
+                          }
+                        }
+                      },
+                      "percent": {
+                        "transform": {
+                          "method": "array"
+                        },
+                        "sharedAxis": true,
+                        "axis": {
+                          "xAxis": {
+                            "dimension": "multiple",
+                            "axisType": "key",
+                            "name": "xAxis"
+                          },
+                          "yAxis": {
+                            "dimension": "multiple",
+                            "axisType": "aggregator",
+                            "minAxisCount": 1.0,
+                            "name": "yAxis"
+                          },
+                          "category": {
+                            "dimension": "multiple",
+                            "axisType": "group",
+                            "name": "category"
+                          }
+                        },
+                        "parameter": {
+                          "inverted": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "invert x and y axes",
+                            "widget": "checkbox",
+                            "name": "inverted"
+                          },
+                          "floatingLegend": {
+                            "valueType": "string",
+                            "defaultValue": "default",
+                            "description": "floating legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "default",
+                              "top-right",
+                              "top-left"
+                            ],
+                            "name": "floatingLegend"
+                          },
+                          "rotateXAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate xAxis labels",
+                            "name": "rotateXAxisLabel"
+                          },
+                          "rotateYAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate yAxis labels",
+                            "name": "rotateYAxisLabel"
+                          },
+                          "dataLabel": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "use data labels in column",
+                            "widget": "checkbox",
+                            "name": "dataLabel"
+                          },
+                          "dataLabelRotation": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate data labels",
+                            "name": "dataLabelRotation"
+                          },
+                          "dataLabelPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "dataLabelPrecision"
+                          },
+                          "tooltipPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "tooltipPrecision"
+                          },
+                          "legendLabelFormat": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "legendLabelFormat"
+                          },
+                          "xAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "xAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "xAxisPosition"
+                          },
+                          "yAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "left",
+                            "description": "yAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "left",
+                              "right"
+                            ],
+                            "name": "yAxisPosition"
+                          },
+                          "showLegend": {
+                            "valueType": "boolean",
+                            "defaultValue": true,
+                            "description": "show legend",
+                            "widget": "checkbox",
+                            "name": "showLegend"
+                          },
+                          "legendPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "position of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "legendPosition"
+                          },
+                          "legendLayout": {
+                            "valueType": "string",
+                            "defaultValue": "horizontal",
+                            "description": "layout of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "horizontal",
+                              "vertical"
+                            ],
+                            "name": "legendLayout"
+                          },
+                          "zoomType": {
+                            "valueType": "string",
+                            "defaultValue": "x",
+                            "description": "type of zoom",
+                            "widget": "option",
+                            "optionValues": [
+                              "y",
+                              "x",
+                              "xy",
+                              "none"
+                            ],
+                            "name": "zoomType"
+                          },
+                          "subTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "sub title of chart",
+                            "name": "subTitle"
+                          },
+                          "mainTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "main title of chart",
+                            "name": "mainTitle"
+                          },
+                          "xAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of xAxis",
+                            "name": "xAxisUnit"
+                          },
+                          "yAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of yAxis",
+                            "name": "yAxisUnit"
+                          },
+                          "xAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of xAxis",
+                            "name": "xAxisName"
+                          },
+                          "yAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of yAxis",
+                            "name": "yAxisName"
+                          },
+                          "tooltipPercentagePrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".2f",
+                            "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "tooltipPercentagePrecision"
+                          }
+                        }
+                      },
+                      "drill-down": {
+                        "transform": {
+                          "method": "drill-down"
+                        },
+                        "sharedAxis": true,
+                        "axis": {
+                          "xAxis": {
+                            "dimension": "multiple",
+                            "axisType": "key",
+                            "name": "xAxis"
+                          },
+                          "yAxis": {
+                            "dimension": "multiple",
+                            "axisType": "aggregator",
+                            "minAxisCount": 1.0,
+                            "name": "yAxis"
+                          },
+                          "category": {
+                            "dimension": "multiple",
+                            "axisType": "group",
+                            "name": "category"
+                          }
+                        },
+                        "parameter": {
+                          "inverted": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "invert x and y axes",
+                            "widget": "checkbox",
+                            "name": "inverted"
+                          },
+                          "floatingLegend": {
+                            "valueType": "string",
+                            "defaultValue": "default",
+                            "description": "floating legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "default",
+                              "top-right",
+                              "top-left"
+                            ],
+                            "name": "floatingLegend"
+                          },
+                          "rotateXAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": -45.0,
+                            "description": "rotate xAxis labels",
+                            "name": "rotateXAxisLabel"
+                          },
+                          "rotateYAxisLabel": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate yAxis labels",
+                            "name": "rotateYAxisLabel"
+                          },
+                          "dataLabel": {
+                            "valueType": "boolean",
+                            "defaultValue": false,
+                            "description": "use data labels in column",
+                            "widget": "checkbox",
+                            "name": "dataLabel"
+                          },
+                          "dataLabelRotation": {
+                            "valueType": "int",
+                            "defaultValue": 0.0,
+                            "description": "rotate data labels",
+                            "name": "dataLabelRotation"
+                          },
+                          "dataLabelPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "dataLabelPrecision"
+                          },
+                          "tooltipPrecision": {
+                            "valueType": "string",
+                            "defaultValue": ".1f",
+                            "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "tooltipPrecision"
+                          },
+                          "legendLabelFormat": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                            "name": "legendLabelFormat"
+                          },
+                          "xAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "xAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "xAxisPosition"
+                          },
+                          "yAxisPosition": {
+                            "valueType": "string",
+                            "defaultValue": "left",
+                            "description": "yAxis position",
+                            "widget": "option",
+                            "optionValues": [
+                              "left",
+                              "right"
+                            ],
+                            "name": "yAxisPosition"
+                          },
+                          "showLegend": {
+                            "valueType": "boolean",
+                            "defaultValue": true,
+                            "description": "show legend",
+                            "widget": "checkbox",
+                            "name": "showLegend"
+                          },
+                          "legendPosition": {
+                            "valueType": "string",
+                            "defaultValue": "bottom",
+                            "description": "position of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "bottom",
+                              "top"
+                            ],
+                            "name": "legendPosition"
+                          },
+                          "legendLayout": {
+                            "valueType": "string",
+                            "defaultValue": "horizontal",
+                            "description": "layout of legend",
+                            "widget": "option",
+                            "optionValues": [
+                              "horizontal",
+                              "vertical"
+                            ],
+                            "name": "legendLayout"
+                          },
+                          "zoomType": {
+                            "valueType": "string",
+                            "defaultValue": "none",
+                            "description": "type of zoom",
+                            "widget": "option",
+                            "optionValues": [
+                              "y",
+                              "x",
+                              "xy",
+                              "none"
+                            ],
+                            "name": "zoomType"
+                          },
+                          "subTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "sub title of chart",
+                            "name": "subTitle"
+                          },
+                          "mainTitle": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "main title of chart",
+                            "name": "mainTitle"
+                          },
+                          "xAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of xAxis",
+                            "name": "xAxisUnit"
+                          },
+                          "yAxisUnit": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "unit of yAxis",
+                            "name": "yAxisUnit"
+                          },
+                          "xAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of xAxis",
+                            "name": "xAxisName"
+                          },
+                          "yAxisName": {
+                            "valueType": "string",
+                            "defaultValue": "",
+                            "description": "name of yAxis",
+                            "name": "yAxisName"
+                          }
+                        }
+                      }
+                    },
+                    "initialized": false,
+                    "version": {
+                      "axis": "{\"column\":[{\"dimension\":\"multiple\",\"axisType\":\"key\",\"name\":\"xAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"aggregator\",\"minAxisCount\":1,\"name\":\"yAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"group\",\"name\":\"category\"}],\"stacked\":[{\"dimension\":\"multiple\",\"axisType\":\"key\",\"name\":\"xAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"aggregator\",\"minAxisCount\":1,\"name\":\"yAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"group\",\"name\":\"category\"}],\"percent\":[{\"dimension\":\"multiple\",\"axisType\":\"key\",\"name\":\"xAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"aggregator\",\"minAxisCount\":1,\"name\":\"yAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"group\",\"name\":\"category\"}],\"drill-down\":[{\"dimension\":\"multiple\",\"axisType\":\"key\",\"name\":\"xAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"aggregator\",\"minAxisCount\":1,\"name\":\"yAxis\"},{\"dimension\":\"multiple\",\"axisType\":\"group\",\"name\":\"category\"}]}",
+                      "parameter": "{\"column\":[{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"invert x and y axes\",\"widget\":\"checkbox\",\"name\":\"inverted\"},{\"valueType\":\"string\",\"defaultValue\":\"default\",\"description\":\"floating legend\",\"widget\":\"option\",\"optionValues\":[\"default\",\"top-right\",\"top-left\"],\"name\":\"floatingLegend\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate xAxis labels\",\"name\":\"rotateXAxisLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate yAxis labels\",\"name\":\"rotateYAxisLabel\"},{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"use data labels in column\",\"widget\":\"checkbox\",\"name\":\"dataLabel\"},{\"valueType\":\"int\",\"defaultValue\":-90,\"description\":\"rotate data labels\",\"name\":\"dataLabelRotation\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"dataLabelPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"tooltipPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"text format of legend (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"legendLabelFormat\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"xAxis position\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"xAxisPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"left\",\"description\":\"yAxis position\",\"widget\":\"option\",\"optionValues\":[\"left\",\"right\"],\"name\":\"yAxisPosition\"},{\"valueType\":\"boolean\",\"defaultValue\":true,\"description\":\"show legend\",\"widget\":\"checkbox\",\"name\":\"showLegend\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"position of legend\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"legendPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"horizontal\",\"description\":\"layout of legend\",\"widget\":\"option\",\"optionValues\":[\"horizontal\",\"vertical\"],\"name\":\"legendLayout\"},{\"valueType\":\"string\",\"defaultValue\":\"x\",\"description\":\"type of zoom\",\"widget\":\"option\",\"optionValues\":[\"y\",\"x\",\"xy\",\"none\"],\"name\":\"zoomType\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"sub title of chart\",\"name\":\"subTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"main title of chart\",\"name\":\"mainTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of xAxis\",\"name\":\"xAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of yAxis\",\"name\":\"yAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of xAxis\",\"name\":\"xAxisName\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of yAxis\",\"name\":\"yAxisName\"}],\"stacked\":[{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"invert x and y axes\",\"widget\":\"checkbox\",\"name\":\"inverted\"},{\"valueType\":\"string\",\"defaultValue\":\"default\",\"description\":\"floating legend\",\"widget\":\"option\",\"optionValues\":[\"default\",\"top-right\",\"top-left\"],\"name\":\"floatingLegend\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate xAxis labels\",\"name\":\"rotateXAxisLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate yAxis labels\",\"name\":\"rotateYAxisLabel\"},{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"use data labels in column\",\"widget\":\"checkbox\",\"name\":\"dataLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate data labels\",\"name\":\"dataLabelRotation\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"dataLabelPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"tooltipPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"text format of legend (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"legendLabelFormat\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"xAxis position\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"xAxisPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"left\",\"description\":\"yAxis position\",\"widget\":\"option\",\"optionValues\":[\"left\",\"right\"],\"name\":\"yAxisPosition\"},{\"valueType\":\"boolean\",\"defaultValue\":true,\"description\":\"show legend\",\"widget\":\"checkbox\",\"name\":\"showLegend\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"position of legend\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"legendPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"horizontal\",\"description\":\"layout of legend\",\"widget\":\"option\",\"optionValues\":[\"horizontal\",\"vertical\"],\"name\":\"legendLayout\"},{\"valueType\":\"string\",\"defaultValue\":\"x\",\"description\":\"type of zoom\",\"widget\":\"option\",\"optionValues\":[\"y\",\"x\",\"xy\",\"none\"],\"name\":\"zoomType\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"sub title of chart\",\"name\":\"subTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"main title of chart\",\"name\":\"mainTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of xAxis\",\"name\":\"xAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of yAxis\",\"name\":\"yAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of xAxis\",\"name\":\"xAxisName\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of yAxis\",\"name\":\"yAxisName\"}],\"percent\":[{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"invert x and y axes\",\"widget\":\"checkbox\",\"name\":\"inverted\"},{\"valueType\":\"string\",\"defaultValue\":\"default\",\"description\":\"floating legend\",\"widget\":\"option\",\"optionValues\":[\"default\",\"top-right\",\"top-left\"],\"name\":\"floatingLegend\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate xAxis labels\",\"name\":\"rotateXAxisLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate yAxis labels\",\"name\":\"rotateYAxisLabel\"},{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"use data labels in column\",\"widget\":\"checkbox\",\"name\":\"dataLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate data labels\",\"name\":\"dataLabelRotation\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"dataLabelPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"tooltipPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"text format of legend (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"legendLabelFormat\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"xAxis position\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"xAxisPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"left\",\"description\":\"yAxis position\",\"widget\":\"option\",\"optionValues\":[\"left\",\"right\"],\"name\":\"yAxisPosition\"},{\"valueType\":\"boolean\",\"defaultValue\":true,\"description\":\"show legend\",\"widget\":\"checkbox\",\"name\":\"showLegend\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"position of legend\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"legendPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"horizontal\",\"description\":\"layout of legend\",\"widget\":\"option\",\"optionValues\":[\"horizontal\",\"vertical\"],\"name\":\"legendLayout\"},{\"valueType\":\"string\",\"defaultValue\":\"x\",\"description\":\"type of zoom\",\"widget\":\"option\",\"optionValues\":[\"y\",\"x\",\"xy\",\"none\"],\"name\":\"zoomType\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"sub title of chart\",\"name\":\"subTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"main title of chart\",\"name\":\"mainTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of xAxis\",\"name\":\"xAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of yAxis\",\"name\":\"yAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of xAxis\",\"name\":\"xAxisName\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of yAxis\",\"name\":\"yAxisName\"},{\"valueType\":\"string\",\"defaultValue\":\".2f\",\"description\":\"precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"tooltipPercentagePrecision\"}],\"drill-down\":[{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"invert x and y axes\",\"widget\":\"checkbox\",\"name\":\"inverted\"},{\"valueType\":\"string\",\"defaultValue\":\"default\",\"description\":\"floating legend\",\"widget\":\"option\",\"optionValues\":[\"default\",\"top-right\",\"top-left\"],\"name\":\"floatingLegend\"},{\"valueType\":\"int\",\"defaultValue\":-45,\"description\":\"rotate xAxis labels\",\"name\":\"rotateXAxisLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate yAxis labels\",\"name\":\"rotateYAxisLabel\"},{\"valueType\":\"boolean\",\"defaultValue\":false,\"description\":\"use data labels in column\",\"widget\":\"checkbox\",\"name\":\"dataLabel\"},{\"valueType\":\"int\",\"defaultValue\":0,\"description\":\"rotate data labels\",\"name\":\"dataLabelRotation\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"dataLabelPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\".1f\",\"description\":\"precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"tooltipPrecision\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"text format of legend (\u003ca href\u003d\\\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\\\"\u003edoc\u003c/a\u003e)\",\"name\":\"legendLabelFormat\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"xAxis position\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"xAxisPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"left\",\"description\":\"yAxis position\",\"widget\":\"option\",\"optionValues\":[\"left\",\"right\"],\"name\":\"yAxisPosition\"},{\"valueType\":\"boolean\",\"defaultValue\":true,\"description\":\"show legend\",\"widget\":\"checkbox\",\"name\":\"showLegend\"},{\"valueType\":\"string\",\"defaultValue\":\"bottom\",\"description\":\"position of legend\",\"widget\":\"option\",\"optionValues\":[\"bottom\",\"top\"],\"name\":\"legendPosition\"},{\"valueType\":\"string\",\"defaultValue\":\"horizontal\",\"description\":\"layout of legend\",\"widget\":\"option\",\"optionValues\":[\"horizontal\",\"vertical\"],\"name\":\"legendLayout\"},{\"valueType\":\"string\",\"defaultValue\":\"none\",\"description\":\"type of zoom\",\"widget\":\"option\",\"optionValues\":[\"y\",\"x\",\"xy\",\"none\"],\"name\":\"zoomType\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"sub title of chart\",\"name\":\"subTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"main title of chart\",\"name\":\"mainTitle\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of xAxis\",\"name\":\"xAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"unit of yAxis\",\"name\":\"yAxisUnit\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of xAxis\",\"name\":\"xAxisName\"},{\"valueType\":\"string\",\"defaultValue\":\"\",\"description\":\"name of yAxis\",\"name\":\"yAxisName\"}]}"
+                    }
+                  },
+                  "chart": {
+                    "current": "column",
+                    "available": [
+                      "column",
+                      "stacked",
+                      "percent",
+                      "drill-down"
+                    ]
+                  },
+                  "axis": {
+                    "column": {
+                      "xAxis": [
+                        {
+                          "name": "title",
+                          "index": 0.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "yAxis": [
+                        {
+                          "name": "avg_rating",
+                          "index": 1.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "category": []
+                    },
+                    "stacked": {
+                      "xAxis": [
+                        {
+                          "name": "title",
+                          "index": 0.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "yAxis": [
+                        {
+                          "name": "avg_rating",
+                          "index": 1.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "category": []
+                    },
+                    "percent": {
+                      "xAxis": [
+                        {
+                          "name": "title",
+                          "index": 0.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "yAxis": [
+                        {
+                          "name": "avg_rating",
+                          "index": 1.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "category": []
+                    },
+                    "drill-down": {
+                      "xAxis": [
+                        {
+                          "name": "title",
+                          "index": 0.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "yAxis": [
+                        {
+                          "name": "avg_rating",
+                          "index": 1.0,
+                          "aggr": "sum"
+                        }
+                      ],
+                      "category": []
+                    }
+                  },
+                  "sharedAxis": {
+                    "xAxis": [
+                      {
+                        "name": "title",
+                        "index": 0.0,
+                        "aggr": "sum"
+                      }
+                    ],
+                    "yAxis": [
+                      {
+                        "name": "avg_rating",
+                        "index": 1.0,
+                        "aggr": "sum"
+                      }
+                    ],
+                    "category": []
+                  },
+                  "axisSpecs": {
+                    "column": [
+                      {
+                        "dimension": "multiple",
+                        "axisType": "key",
+                        "name": "xAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "aggregator",
+                        "minAxisCount": 1.0,
+                        "name": "yAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "group",
+                        "name": "category"
+                      }
+                    ],
+                    "stacked": [
+                      {
+                        "dimension": "multiple",
+                        "axisType": "key",
+                        "name": "xAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "aggregator",
+                        "minAxisCount": 1.0,
+                        "name": "yAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "group",
+                        "name": "category"
+                      }
+                    ],
+                    "percent": [
+                      {
+                        "dimension": "multiple",
+                        "axisType": "key",
+                        "name": "xAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "aggregator",
+                        "minAxisCount": 1.0,
+                        "name": "yAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "group",
+                        "name": "category"
+                      }
+                    ],
+                    "drill-down": [
+                      {
+                        "dimension": "multiple",
+                        "axisType": "key",
+                        "name": "xAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "aggregator",
+                        "minAxisCount": 1.0,
+                        "name": "yAxis"
+                      },
+                      {
+                        "dimension": "multiple",
+                        "axisType": "group",
+                        "name": "category"
+                      }
+                    ]
+                  },
+                  "parameter": {
+                    "column": {
+                      "inverted": false,
+                      "floatingLegend": "default",
+                      "rotateXAxisLabel": 0.0,
+                      "rotateYAxisLabel": 0.0,
+                      "dataLabel": false,
+                      "dataLabelRotation": -90.0,
+                      "dataLabelPrecision": ".1f",
+                      "tooltipPrecision": ".1f",
+                      "legendLabelFormat": "",
+                      "xAxisPosition": "bottom",
+                      "yAxisPosition": "left",
+                      "showLegend": true,
+                      "legendPosition": "bottom",
+                      "legendLayout": "horizontal",
+                      "zoomType": "x",
+                      "subTitle": "",
+                      "mainTitle": "",
+                      "xAxisUnit": "",
+                      "yAxisUnit": "",
+                      "xAxisName": "",
+                      "yAxisName": ""
+                    },
+                    "stacked": {
+                      "inverted": false,
+                      "floatingLegend": "default",
+                      "rotateXAxisLabel": 0.0,
+                      "rotateYAxisLabel": 0.0,
+                      "dataLabel": false,
+                      "dataLabelRotation": 0.0,
+                      "dataLabelPrecision": ".1f",
+                      "tooltipPrecision": ".1f",
+                      "legendLabelFormat": "",
+                      "xAxisPosition": "bottom",
+                      "yAxisPosition": "left",
+                      "showLegend": true,
+                      "legendPosition": "bottom",
+                      "legendLayout": "horizontal",
+                      "zoomType": "x",
+                      "subTitle": "",
+                      "mainTitle": "",
+                      "xAxisUnit": "",
+                      "yAxisUnit": "",
+                      "xAxisName": "",
+                      "yAxisName": ""
+                    },
+                    "percent": {
+                      "inverted": false,
+                      "floatingLegend": "default",
+                      "rotateXAxisLabel": 0.0,
+                      "rotateYAxisLabel": 0.0,
+                      "dataLabel": false,
+                      "dataLabelRotation": 0.0,
+                      "dataLabelPrecision": ".1f",
+                      "tooltipPrecision": ".1f",
+                      "legendLabelFormat": "",
+                      "xAxisPosition": "bottom",
+                      "yAxisPosition": "left",
+                      "showLegend": true,
+                      "legendPosition": "bottom",
+                      "legendLayout": "horizontal",
+                      "zoomType": "x",
+                      "subTitle": "",
+                      "mainTitle": "",
+                      "xAxisUnit": "",
+                      "yAxisUnit": "",
+                      "xAxisName": "",
+                      "yAxisName": "",
+                      "tooltipPercentagePrecision": ".2f"
+                    },
+                    "drill-down": {
+                      "inverted": false,
+                      "floatingLegend": "default",
+                      "rotateXAxisLabel": -45.0,
+                      "rotateYAxisLabel": 0.0,
+                      "dataLabel": false,
+                      "dataLabelRotation": 0.0,
+                      "dataLabelPrecision": ".1f",
+                      "tooltipPrecision": ".1f",
+                      "legendLabelFormat": "",
+                      "xAxisPosition": "bottom",
+                      "yAxisPosition": "left",
+                      "showLegend": true,
+                      "legendPosition": "bottom",
+                      "legendLayout": "horizontal",
+                      "zoomType": "none",
+                      "subTitle": "",
+                      "mainTitle": "",
+                      "xAxisUnit": "",
+                      "yAxisUnit": "",
+                      "xAxisName": "",
+                      "yAxisName": ""
+                    }
+                  },
+                  "paramSpecs": {
+                    "column": [
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "invert x and y axes",
+                        "widget": "checkbox",
+                        "name": "inverted"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "default",
+                        "description": "floating legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "default",
+                          "top-right",
+                          "top-left"
+                        ],
+                        "name": "floatingLegend"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate xAxis labels",
+                        "name": "rotateXAxisLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate yAxis labels",
+                        "name": "rotateYAxisLabel"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "use data labels in column",
+                        "widget": "checkbox",
+                        "name": "dataLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": -90.0,
+                        "description": "rotate data labels",
+                        "name": "dataLabelRotation"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "dataLabelPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "tooltipPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "legendLabelFormat"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "xAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "xAxisPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "left",
+                        "description": "yAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "left",
+                          "right"
+                        ],
+                        "name": "yAxisPosition"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": true,
+                        "description": "show legend",
+                        "widget": "checkbox",
+                        "name": "showLegend"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "position of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "legendPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "horizontal",
+                        "description": "layout of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "horizontal",
+                          "vertical"
+                        ],
+                        "name": "legendLayout"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "x",
+                        "description": "type of zoom",
+                        "widget": "option",
+                        "optionValues": [
+                          "y",
+                          "x",
+                          "xy",
+                          "none"
+                        ],
+                        "name": "zoomType"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "sub title of chart",
+                        "name": "subTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "main title of chart",
+                        "name": "mainTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of xAxis",
+                        "name": "xAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of yAxis",
+                        "name": "yAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of xAxis",
+                        "name": "xAxisName"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of yAxis",
+                        "name": "yAxisName"
+                      }
+                    ],
+                    "stacked": [
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "invert x and y axes",
+                        "widget": "checkbox",
+                        "name": "inverted"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "default",
+                        "description": "floating legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "default",
+                          "top-right",
+                          "top-left"
+                        ],
+                        "name": "floatingLegend"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate xAxis labels",
+                        "name": "rotateXAxisLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate yAxis labels",
+                        "name": "rotateYAxisLabel"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "use data labels in column",
+                        "widget": "checkbox",
+                        "name": "dataLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate data labels",
+                        "name": "dataLabelRotation"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "dataLabelPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "tooltipPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "legendLabelFormat"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "xAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "xAxisPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "left",
+                        "description": "yAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "left",
+                          "right"
+                        ],
+                        "name": "yAxisPosition"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": true,
+                        "description": "show legend",
+                        "widget": "checkbox",
+                        "name": "showLegend"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "position of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "legendPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "horizontal",
+                        "description": "layout of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "horizontal",
+                          "vertical"
+                        ],
+                        "name": "legendLayout"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "x",
+                        "description": "type of zoom",
+                        "widget": "option",
+                        "optionValues": [
+                          "y",
+                          "x",
+                          "xy",
+                          "none"
+                        ],
+                        "name": "zoomType"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "sub title of chart",
+                        "name": "subTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "main title of chart",
+                        "name": "mainTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of xAxis",
+                        "name": "xAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of yAxis",
+                        "name": "yAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of xAxis",
+                        "name": "xAxisName"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of yAxis",
+                        "name": "yAxisName"
+                      }
+                    ],
+                    "percent": [
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "invert x and y axes",
+                        "widget": "checkbox",
+                        "name": "inverted"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "default",
+                        "description": "floating legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "default",
+                          "top-right",
+                          "top-left"
+                        ],
+                        "name": "floatingLegend"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate xAxis labels",
+                        "name": "rotateXAxisLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate yAxis labels",
+                        "name": "rotateYAxisLabel"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "use data labels in column",
+                        "widget": "checkbox",
+                        "name": "dataLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate data labels",
+                        "name": "dataLabelRotation"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "dataLabelPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "tooltipPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "legendLabelFormat"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "xAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "xAxisPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "left",
+                        "description": "yAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "left",
+                          "right"
+                        ],
+                        "name": "yAxisPosition"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": true,
+                        "description": "show legend",
+                        "widget": "checkbox",
+                        "name": "showLegend"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "position of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "legendPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "horizontal",
+                        "description": "layout of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "horizontal",
+                          "vertical"
+                        ],
+                        "name": "legendLayout"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "x",
+                        "description": "type of zoom",
+                        "widget": "option",
+                        "optionValues": [
+                          "y",
+                          "x",
+                          "xy",
+                          "none"
+                        ],
+                        "name": "zoomType"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "sub title of chart",
+                        "name": "subTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "main title of chart",
+                        "name": "mainTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of xAxis",
+                        "name": "xAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of yAxis",
+                        "name": "yAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of xAxis",
+                        "name": "xAxisName"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of yAxis",
+                        "name": "yAxisName"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".2f",
+                        "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "tooltipPercentagePrecision"
+                      }
+                    ],
+                    "drill-down": [
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "invert x and y axes",
+                        "widget": "checkbox",
+                        "name": "inverted"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "default",
+                        "description": "floating legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "default",
+                          "top-right",
+                          "top-left"
+                        ],
+                        "name": "floatingLegend"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": -45.0,
+                        "description": "rotate xAxis labels",
+                        "name": "rotateXAxisLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate yAxis labels",
+                        "name": "rotateYAxisLabel"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": false,
+                        "description": "use data labels in column",
+                        "widget": "checkbox",
+                        "name": "dataLabel"
+                      },
+                      {
+                        "valueType": "int",
+                        "defaultValue": 0.0,
+                        "description": "rotate data labels",
+                        "name": "dataLabelRotation"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of data label format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "dataLabelPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": ".1f",
+                        "description": "precision of tooltip format without \u003ccode\u003e:\u003c/code\u003e (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "tooltipPrecision"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "text format of legend (\u003ca href\u003d\"http://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting\"\u003edoc\u003c/a\u003e)",
+                        "name": "legendLabelFormat"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "xAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "xAxisPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "left",
+                        "description": "yAxis position",
+                        "widget": "option",
+                        "optionValues": [
+                          "left",
+                          "right"
+                        ],
+                        "name": "yAxisPosition"
+                      },
+                      {
+                        "valueType": "boolean",
+                        "defaultValue": true,
+                        "description": "show legend",
+                        "widget": "checkbox",
+                        "name": "showLegend"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "bottom",
+                        "description": "position of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "bottom",
+                          "top"
+                        ],
+                        "name": "legendPosition"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "horizontal",
+                        "description": "layout of legend",
+                        "widget": "option",
+                        "optionValues": [
+                          "horizontal",
+                          "vertical"
+                        ],
+                        "name": "legendLayout"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "none",
+                        "description": "type of zoom",
+                        "widget": "option",
+                        "optionValues": [
+                          "y",
+                          "x",
+                          "xy",
+                          "none"
+                        ],
+                        "name": "zoomType"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "sub title of chart",
+                        "name": "subTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "main title of chart",
+                        "name": "mainTitle"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of xAxis",
+                        "name": "xAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "unit of yAxis",
+                        "name": "yAxisUnit"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of xAxis",
+                        "name": "xAxisName"
+                      },
+                      {
+                        "valueType": "string",
+                        "defaultValue": "",
+                        "description": "name of yAxis",
+                        "name": "yAxisName"
+                      }
+                    ]
+                  }
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default",
+                  "stacked": true
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "avg_rating",
+                  "index": 1.0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [
+                {
+                  "name": "title",
+                  "index": 0.0,
+                  "aggr": "sum"
+                }
+              ],
+              "values": [
+                {
+                  "name": "cnt_ratings",
+                  "index": 2.0,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true,
+        "title": true,
+        "editorHide": false,
+        "lineNumbers": true
+      },
+      "settings": {
+        "params": {
+          "avgRatingMin": "4",
+          "RatingsMin": "100"
+        },
+        "forms": {
+          "avgRatingMin": {
+            "type": "TextBox",
+            "name": "avgRatingMin",
+            "defaultValue": "4",
+            "hidden": false
+          },
+          "RatingsMin": {
+            "type": "TextBox",
+            "name": "RatingsMin",
+            "defaultValue": "100",
+            "hidden": false
+          }
+        }
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "title\tavg_rating\tcnt_ratings\nUp (2009)\t4.00\t105\nLord of the Rings: The Two Towers, The (2002)\t4.02\t188\nLéon: The Professional (a.k.a. The Professional) (Léon) (1994)\t4.02\t133\nBraveheart (1995)\t4.03\t237\nBack to the Future (1985)\t4.04\t171\nTrainspotting (1996)\t4.04\t102\nIndiana Jones and the Last Crusade (1989)\t4.05\t140\nAmerican Beauty (1999)\t4.06\t204\nWALL·E (2008)\t4.06\t104\nInception (2010)\t4.07\t143\nGood Will Hunting (1997)\t4.08\t141\nShining, The (1980)\t4.08\t109\nBlade Runner (1982)\t4.10\t124\nFull Metal Jacket (1987)\t4.10\t102\nLord of the Rings: The Fellowship of the Ring, The (2001)\t4.11\t198\nTaxi Driver (1976)\t4.11\t104\nLord of the Rings: The Return of the King, The (2003)\t4.12\t185\nFargo (1996)\t4.12\t181\nMemento (2000)\t4.12\t159\nStar Wars: Episode VI - Return of the Jedi (1983)\t4.14\t196\nSaving Private Ryan (1998)\t4.15\t188\nGreen Mile, The (1999)\t4.15\t111\nForrest Gump (1994)\t4.16\t329\nSilence of the Lambs, The (1991)\t4.16\t279\nMonty Python and the Holy Grail (1975)\t4.16\t136\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1574061250957_532560724",
+      "id": "20191118-071410_1331801439",
+      "dateCreated": "2019-11-18 07:14:10.957",
+      "dateStarted": "2019-11-27 19:09:03.086",
+      "dateFinished": "2019-11-27 19:09:03.178",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%postgre\n",
+      "user": "anonymous",
+      "dateUpdated": "2019-11-27 19:09:03.579",
+      "config": {
+        "colWidth": 12.0,
+        "fontSize": 9.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1574053795719_-1644952246",
+      "id": "20191118-050955_800867164",
+      "dateCreated": "2019-11-18 05:09:55.719",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "demo-zeppelin-nb-04",
+  "id": "2ESH8DGFS",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {
+    "md:shared_process": [],
+    "python:shared_process": [],
+    "postgres:shared_process": [],
+    "sh:shared_process": [],
+    "spark:shared_process": []
+  },
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {}
+}
